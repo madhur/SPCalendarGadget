@@ -21,20 +21,24 @@
 <script type="text/javascript" src="jqwidgets/jqxtooltip.js"></script>
 <script type="text/javascript" src="js/DatePicker.js"></script>
 </head>
-<body onload="init()" id="bodyid">
-<div id='jqxcal'></div>
+<body id="bodyid">
+<!-- <table>
+	<tr><td id="flyoutlink" onclick="">Flyout</td></tr>
+</table> -->
+<!-- <input type="text" id="text_id"/> -->
+<div id='jqxcal' onclick=""></div>
 <!-- 
 <div id="tbl_upcoming">
 <input type="button" id="a_upcoming" value=">>" onclick="javascript:CheckDockState()"> 
 </div> -->
 <div id="upcomingdiv">
+<h5 id="upcomingTitle"><center>Upcoming Changes</center></h5>
 <table  cellspacing="0px" cellpadding="0px" id="tblSPContent" class="tblSPContent_class">
 <tr>
-			<th class="tblHeader_class">Start Date</th>
-			<th class="tblHeader_class">End Date</th>
-			<th class="tblHeader_class">Line of Business</th>
-			<th class="tblHeader_class">Application Name</th>
-			<th class="tblHeader_class">Project Title</th>
+			<th class="tblHeader_class">Chg Date</th>
+			<th class="tblHeader_class">LOB</th>
+			<th class="tblHeader_class">App</th>
+			<th class="tblHeader_class">Description</th>
 </tr>				
 </table>
 </div>

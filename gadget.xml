@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <gadget>
-  <name>24Jan_chgCal</name>
+  <name>5Feb</name>
   <version>1.0.0.0</version>
   <author name="Microsoft">
     <info url="msdn.microsoft.com" />
   </author>
   <copyright>&#169; Microsoft Corporation.</copyright>
-  <description>"24Jan_chgCal" Sidebar gadget sample.</description>
+  <description>"5Feb" Sidebar gadget sample.</description>
   <hosts>
     <host name="sidebar">
       <base type="HTML" apiVersion="1.0.0" src="DatePicker.html" />

@@ -1,0 +1,58 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=Unicode" />
+		<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>		
+		<link rel="stylesheet" type="text/css" href="css/settings.css">
+		<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>		
+		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/jquery.raty.min.js"></script>
+<script type="text/javascript" src="jqwidgets/jqxcore.js"></script>
+<script type="text/javascript" src="jqwidgets/jqxdatetimeinput.js"></script>
+<script type="text/javascript" src="jqwidgets/jqxcalendar.js"></script>
+<script type="text/javascript" src="jqwidgets/globalization/globalize.js"></script>
+<script type="text/javascript" src="js/jquery.SPServices-2013.01.min.js"></script>
+<script type="text/javascript" src="js/yui-min.js"></script>
+<script type="text/javascript" src="js/sugar.min.js"></script>
+<script type="text/javascript" src="js/demos.js"></script>
+<script type="text/javascript" src="jqwidgets/jqxtooltip.js"></script>
+<script type="text/javascript" src="js/new_settings.js"></script>
+        <title>Change Calendar Configuration Settings</title>
+    </head>
+	
+    <body  onload="return initLoad();">
+	<fieldset>
+	<legend>Change Calendar Configuration</legend>
+		<table id="tblappSelect">
+		<tr>
+			<th id="theader">Application Filter</td>
+		</tr>
+		<tr>
+			<td>
+				<select id="appSelect" multiple>
+						
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<input type="submit" value="ApplyFilter" onclick="setSelectedValues();">
+		</tr>
+		
+		<!-- <tr>
+			<td>
+					Theme
+					
+				</select>
+			</td>
+			<td>
+					<select id=theme>
+					<option name=classic value=classic> Classic </option>
+					<option name=modern value=modern> Modern </option>
+					
+				</select>
+			</td>
+		</tr>
+		 -->
+		</table>
+		</fieldset>
+    </body>
+</html>

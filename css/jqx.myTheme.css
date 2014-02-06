@@ -1,6 +1,14 @@
-﻿.jqx-calendar-cell-myTheme, .jqx-calendar-title-container-myTheme, .calendar-header-myTheme, .jqx-calendar-title-content-myTheme, 
+﻿.jqx-calendar-cell-myTheme, .jqx-calendar-title-container-myTheme, .calendar-header-myTheme, 
 .jqx-calendar-column-cell-myTheme
 {
-	font-size:10px;
+	font-size:11px;
 	border:0px;
+	font-family:verdana;
+}
+
+.jqx-calendar-title-content-myTheme{
+font-size:12px;
+	border:0px;
+	font-weight:bold;
+	font-family:verdana;
 }
