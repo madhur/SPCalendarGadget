@@ -16,7 +16,7 @@
     var gadgetHeight = '250px';
     var gadgetWidth = '250px';
     var expandedHeight = '450px';
-    var globalCurrentMonth;
+    var globalCurrentMonth, globalCurrentYear;
 
     function IsGadget()
     {
@@ -61,54 +61,56 @@
 
     	var now = new Date();
     	globalCurrentMonth = now.getMonth();
-    	var year = now.getFullYear();
+    	globalCurrentYear = now.getFullYear();
 
-    	var startDate = getminFormattedDate(globalCurrentMonth, year)
-    	var endDate = getmaxFormattedDate(globalCurrentMonth, year)
+    	var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
+    	var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
 
-    	var responseJSON = getandhighlightCalendarDates(startDate, endDate);
+    	var responseJSON = getCalendarDates(startDate, endDate);
 
     	nextFiveChanges(responseJSON);
 
     	$("#cellTableViewjqxcal td").each(function()
     	{
-    		bindCalendarDate(this, responseJSON);
+    		if ($(this).css("visibility") == "hidden")
+    		{
+    			// console.log("hidden: "+$(this).text());
+    		}
+    		else
+    		{
+    			doDateBindings(this, responseJSON);
+    		}
     	});
 
     	$('#jqxcal').on('backButtonClick', function()
     	{
 
-            $("#cellTableViewjqxcal td").each(function()
-            {
-                resetCalendarDateColor(this);
-                
-            });
-
-    		year = now.getFullYear();
-    		// var getDate = $('#jqxcal').jqxCalendar('getDate');
-    		// console.log(getDate);
+    		// year = now.getFullYear();
     		globalCurrentMonth = globalCurrentMonth - 1;
 
     		if (globalCurrentMonth == -1)
     		{
     			globalCurrentMonth = 11;
-    			year = year - 1;
+    			globalCurrentYear = globalCurrentYear - 1;
     		}
     		if (globalCurrentMonth == 12)
     		{
     			globalCurrentMonth = 0;
-    			year = year + 1;
+    			globalCurrentYear = globalCurrentYear + 1;
     		}
 
     		//console.log(month);
-    		var startDate = getminFormattedDate(globalCurrentMonth, year)
-    		var endDate = getmaxFormattedDate(globalCurrentMonth, year)
-    		var responseJSON = getandhighlightCalendarDates(startDate, endDate);
+    		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
+    		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
+    		var responseJSON = getCalendarDates(startDate, endDate);
 
     		$("#cellTableViewjqxcal td").each(function()
     		{
-    			
-    			bindCalendarDate(this, responseJSON);
+    			if ($(this).css("visibility") == "hidden")
+    			{}
+    			else
+    				doDateBindings(this, responseJSON);
+
     		});
 
     	});
@@ -116,60 +118,82 @@
 
     	$('#jqxcal').on('nextButtonClick', function()
     	{
-
-
-    		$("#cellTableViewjqxcal td").each(function()
-    		{
-    			resetCalendarDateColor(this);
-    		});
-
-    		year = now.getFullYear();
-    		// var getDate = $('#jqxcal').jqxCalendar('getDate');
-    		// console.log(getDate);
+    		// year = now.getFullYear();
 
     		globalCurrentMonth = globalCurrentMonth + 1;
 
     		if (globalCurrentMonth == -1)
     		{
     			globalCurrentMonth = 11;
-    			year = year - 1;
+    			globalCurrentYear = globalCurrentYear - 1;
     		}
     		if (globalCurrentMonth == 12)
     		{
     			globalCurrentMonth = 0;
-    			year = year + 1;
+    			globalCurrentYear = globalCurrentYear + 1;
     		}
 
     		// console.log(month);
-    		var startDate = getminFormattedDate(globalCurrentMonth, year)
-    		var endDate = getmaxFormattedDate(globalCurrentMonth, year)
+    		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
+    		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
 
 
-    		var responseJSON = getandhighlightCalendarDates(startDate, endDate);
+    		var responseJSON = getCalendarDates(startDate, endDate);
 
 
     		$("#cellTableViewjqxcal td").each(function()
     		{
-    			
-    			bindCalendarDate(this, responseJSON);
+
+    			if ($(this).css("visibility") == "hidden")
+    			{}
+    			else
+    				doDateBindings(this, responseJSON);
+
     		});
 
     	});
 
     }
 
-    function resetCalendarDateColor(elem)
+
+    function doDateBindings(tdelem, responseJSON)
     {
-    	$(elem).css(
+
+    	$(tdelem).css(
     	{
     		'background': 'transparent',
-    		'color': 'black'
+    		'color': 'black',
+    		'cursor': 'none'
+    	});
+    	$(tdelem).unbind('click mouseenter mouseleave');
+
+    	$.each(responseJSON, function(i, cal)
+    	{
+
+    		EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+
+    		var tdText = $(tdelem).text();
+    		if (tdText < 10)
+    		{
+    			tdText = "0" + tdText;
+    		}
+    		if (tdText === EventDate_Arr[3])
+    		{
+    			bindCalendarDate(tdelem, responseJSON);
+    			return false;
+    		}
+
     	});
     }
 
-
     function bindCalendarDate(elem, responseJSON)
     {
+    	$(elem).css(
+    	{
+    		'background': '#F9C400',
+    		'color': '#fff',
+    		'cursor': 'pointer'
+    	});
 
     	$(elem).hover(
     		function()
@@ -189,7 +213,7 @@
 
     		return false;
     	}
-    	$(elem).unbind('click', tdonclick);
+
     	$(elem).bind('click', tdonclick);
 
     }
@@ -217,7 +241,28 @@
 
     function showFlyout(onDateClickText, responseJSON)
     {
-    	clickevent(onDateClickText, responseJSON);
+    	var tableContents = "";
+
+        if (onDateClickText < 10)
+        {
+            onDateClickText = "0" + onDateClickText;
+        }
+
+        $.each(responseJSON, function(i, cal)
+        {
+            EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+            EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+
+            /*******    DISPLAY THE CLICKED DATE'S CHANGES ON FLYOUT        ******/
+            if ((EventDate_Arr[3] == onDateClickText))
+            {
+                tableContents = tableContents +
+                    "<tr><td>" + EventDate_Arr[3] + "-" + EventDate_Arr[2] + "-" + EventDate_Arr[1] + "</td>" + "<td>" + cal.LOB + "</td>" + "<td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
+
+            }
+        });
+
+        ActiveFlyout = tableContents;
 
     	if (IsGadget())
     	{
@@ -341,43 +386,8 @@
 
     }
 
-    function highlight(elem)
-    {
-    	title = $(elem).attr("ows_Title");
-
-    	date1 = new Date();
-    	date1 = $(elem).attr("ows_EventDate");
-    	var match1 = date1.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/)
-    	date1parse = new Date(match1[1], match1[2] - 1, match1[3], match1[4], match1[5], match1[6])
-
-
-    	date2 = new Date();
-    	date2 = $(elem).attr("ows_EndDate");
-
-
-    	var match2 = date2.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/)
-    	date2parse = new Date(match2[1], match2[2] - 1, match2[3], match2[4], match2[5], match2[6])
-
-    	$("#cellTableViewjqxcal").find("td").filter(function()
-    	{
-    		if ($(this).text() == date1parse.getDate())
-    		{
-
-    			$(this).css(
-    			{
-    				'background': '#F9C400',
-    				'color': '#fff'
-    			});
-    			changeDateArr[i] = parseInt(date1parse.getDate());
-    			i++;
-    		}
-
-    	});
-
-    }
-
     /*******  	GET THE DATA FROM SHAREPOINT 		******/
-    function getandhighlightCalendarDates(start, end)
+    function getCalendarDates(start, end)
     {
     	var responseJSON;
     	var functionStatus;
@@ -392,11 +402,6 @@
     		CAMLQuery: myQuery,
     		completefunc: function(xData, Status)
     		{
-    			$(xData.responseXML).SPFilterNode("z:row").each(function()
-    			{
-    				highlight(this);
-    			});
-
     			changeDateArr.sort();
 
     			responseJSON = $(xData.responseXML).SPFilterNode("z:row").SPXmlToJson(
@@ -409,38 +414,11 @@
 
     		/*****************************************************************/
     	});
+
+    	//console.log(responseJSON);
     	return responseJSON;
     }
-
-    /*******  	DISPLAY THE FLYOUT ON CLICK 		******/
-    function clickevent(onDateClickText, responseJSON)
-    {
-
-    	var tableContents = "";
-
-    	if (onDateClickText < 10)
-    	{
-    		onDateClickText = "0" + onDateClickText;
-    	}
-
-    	$.each(responseJSON, function(i, cal)
-    	{
-    		EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
-    		EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
-
-    		/*******  	DISPLAY THE CLICKED DATE'S CHANGES ON FLYOUT 		******/
-    		if ((EventDate_Arr[3] == onDateClickText))
-    		{
-    			tableContents = tableContents +
-    				"<tr><td>" + EventDate_Arr[3] + "-" + EventDate_Arr[2] + "-" + EventDate_Arr[1] + "</td>" + "<td>" + cal.LOB + "</td>" + "<td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
-
-    		}
-    	});
-    	ActiveFlyout = tableContents;
-
-
-    }
-
+ 
     function truncateString(str, limit)
     {
     	if (str.length > limit)

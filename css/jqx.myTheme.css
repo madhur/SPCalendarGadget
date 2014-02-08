@@ -25,3 +25,10 @@ font-size:13px;
 	font-family:verdana;
 	cursor:none;
 }
+
+.jqx-calendar-cell-today-myTheme
+{
+	background-color:blue;
+	color:white;
+
+}
