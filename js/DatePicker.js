@@ -12,6 +12,8 @@
 				$().SPServices.defaults.webURL = "https://teams.aexp.com/sites/teamsitewendy/";
 				$().SPServices.defaults.listName = changeCalendarList;
 				var date1,date2,chgStart,chgEnd,title,flyoutWindow, flyoutWinDoc, onDateClickText, EventDate_Arr,EndDate_Arr, ActiveFlyout,myWin,count,iter, index_nextFive, firstIndex, responseJSON, date1parse, date2parse,upcomingContents,appName,timeTransition,appSelectOptions, startDate, endDate,month, year, now;
+				var responsefilteredJSON;
+				var filteredAppNames = new Array();
 				var clickCount=0;
 				timeTransition=10;
 				var changeDateArr = new Array();
@@ -20,26 +22,22 @@
 				var tableContentsArr = new Array();
 				var truncateLimit = 7;
 				
-				
-				
+	
 $(document).ready(function ()
 {
 			$("#jqxcal").jqxCalendar({ width: '250px', height: '250px', theme:'myTheme',enableViews: false, enableFastNavigation: false, showOtherMonthDays: false});
-
-				 //init();
+			
 				var IsGadget = (window.System != undefined);
 					
 					if (IsGadget)
 					{
-						System.Gadget.Flyout.file = "flyout.html";
-						System.Gadget.Flyout.show = false;
+						// System.Gadget.Flyout.file = "flyout.html";
+						// System.Gadget.Flyout.show = false;
 						
 						System.Gadget.settingsUI = "Settings.html";
 						System.Gadget.onDock =  CheckDockState;
 						System.Gadget.onUndock = CheckDockState;
-						
-						//System.Gadget.Flyout.onShow = FlyoutLoaded;
-						//System.Gadget.onSettingsClosed = SettingsClosed;  
+					
 					}	
 					
 					 now = new Date();
@@ -53,29 +51,35 @@ $(document).ready(function ()
 					 maxDate.setMinutes(maxDate.getMinutes()+30);
 					 startDate = minDate.toISOString().replace(".000", ""); //"yyyy-mm-ddThh:mm:ssZ"
 					 endDate = maxDate.toISOString().replace(".000", "");
-				//	 console.log("Start "+startDate);
-				//	 console.log("End "+endDate);
+			
 					 responseJSON = getchgCalendarData(startDate,endDate);
-				//	 console.log("Res "+responseJSON);
-					 
+					// responsefilteredJSON = getchgCalendarFilteredData();
+				
 					 $("#cellTableViewjqxcal td").each(function(){
+						$(this).hover(
+												function() {
+													$(this).addClass( "jqx-calendar-cell-selected" );
+													}, function() {
+													$(this).removeClass( "jqx-calendar-cell-selected" );
+													});
+							
 					    var tdonclick = function(ev)
 						{
 							ev.preventDefault();
 							onDateClickText=$(this).text();
-						    $(this).css({'background': '#003399','color': '#ff0000'});
+						   // $(this).css({'background': '#003399','color': '#ff0000'});
+						   
 							showFlyout(onDateClickText);
+							
 							return false;
 						}
 						$(this).unbind('click',tdonclick);
 						$(this).bind('click',tdonclick);
 						//$(this).css({'background':'#F9C400', 'color':'#fff'});
 					 });
-					
-
+			
 						nextFiveChanges(responseJSON);
 						onMonthChange(now.getMonth());				 
-
 });
 
 			function init()
@@ -86,17 +90,9 @@ $(document).ready(function ()
 					{
 						System.Gadget.Flyout.file = "flyout.html";
 						System.Gadget.Flyout.show = false;
-						
-					//	System.Gadget.settingsUI = "Settings.html";
-					//	System.Gadget.onDock =  CheckDockState;
-					//	System.Gadget.onUndock = CheckDockState;
-						
-					//	System.Gadget.Flyout.onShow = FlyoutLoaded;
-					//	System.Gadget.onSettingsClosed = SettingsClosed;
+					
 					}
 					
-					
-					 
 					 now = new Date();
 					 month=now.getMonth();
 					 year=now.getFullYear();
@@ -108,45 +104,22 @@ $(document).ready(function ()
 					 maxDate.setMinutes(maxDate.getMinutes()+30);
 					 startDate = minDate.toISOString().replace(".000", ""); //"yyyy-mm-ddThh:mm:ssZ"
 					 endDate = maxDate.toISOString().replace(".000", "");
-				//	 console.log("Start "+startDate);
-				//	 console.log("End "+endDate);
+				
 					 responseJSON = getchgCalendarData(startDate,endDate);
+					 //responsefilteredJSON = getchgCalendarFilteredData();
 					 onMonthChange(now.getMonth());
-				//	 console.log("Res "+responseJSON);
-					 
-					 
-					 var tdonclick1 = function(ev)
-						{
-							ev.preventDefault();
-							onDateClickText=$(this).text();
-							showFlyout(onDateClickText);
-							$(this).css({'background': '#003399','color': '#ff0000'});
-							return false;
-						}
-						$("#cellTableViewjqxcal td").unbind('click',tdonclick1);
-						$("#cellTableViewjqxcal td").bind('click',tdonclick1);
-						
-						nextFiveChanges(responseJSON);
-						
-					
-					 // $('#jqxcal').bind('valuechanged', function (event) {
-					// if(IsGadget())
-						// System.Gadget.Flyout.show = !System.Gadget.Flyout.show;
-						// clickevent();
-					// });
+				
+					 nextFiveChanges(responseJSON);
 				}    
 			
 		 function showFlyout(onDateClickText)
 			{
-			//	console.log("onDateClickText = "+onDateClickText);
 				clickevent(onDateClickText);
 	 
 						if(IsGadget())
 						   {
 							System.Gadget.Flyout.file = "flyout.html";
-							//System.Gadget.Flyout.show=true;
 							System.Gadget.Flyout.show = !System.Gadget.Flyout.show;
-							 
 						    System.Gadget.Flyout.onShow = FlyoutLoaded; 
 							}
 						else
@@ -168,14 +141,18 @@ $(document).ready(function ()
 					 
 					 $('#jqxcal').on('backButtonClick', function () {
 					
-						//$('#jqxcal').jqxCalendar('clear');				
-						
 						 $("#cellTableViewjqxcal").find("td").filter(function(){
 							// $(this).css({'background':'#F2F2F2', 'color':'#757A64'})
 							$(this).css({'background':'none', 'color':'#757A64'});
+							$(this).onhover(
+									function() {
+											$(this).addClass( "jqx-calendar-cell-selected" );
+											}, function() {
+											$(this).removeClass( "jqx-calendar-cell-selected" );
+											});
+					
 						 });
 						
-						//var getDate=$('#jqxcal').jqxCalendar('getDate');
 						
 						month=month-1;
 						
@@ -189,7 +166,7 @@ $(document).ready(function ()
 							month=0;
 							year=year+1;
 						}
-					//	console.log("Month num back "+month+"year next " +year);
+			
 						
 					 minDate = new Date(year, month, 1);
 					 maxDate = new Date(year, month+1, 0);
@@ -199,18 +176,25 @@ $(document).ready(function ()
 					 maxDate.setMinutes(maxDate.getMinutes()+30);
 					 startDate = minDate.toISOString().replace(".000", ""); //"yyyy-mm-ddThh:mm:ssZ"
 					 endDate = maxDate.toISOString().replace(".000", "");
-					// console.log("Start "+startDate);
-					// console.log("End "+endDate);
+					
 					 responseJSON = getchgCalendarData(startDate,endDate);
+					 //responsefilteredJSON = getchgCalendarFilteredData();
 						
 					});
 				
 					$('#jqxcal').on('nextButtonClick', function () {
-						//$('#jqxcal').jqxCalendar('clear'); 
-						
+					
 						 $("#cellTableViewjqxcal").find("td").filter(function(){
 							// $(this).css({'background':'#F2F2F2', 'color':'#757A64'})
 							$(this).css({'background':'none', 'color':'#757A64'});
+							$(this).onhover(
+									function() {
+											$(this).addClass( "jqx-calendar-cell-selected" );
+											}, function() {
+											$(this).removeClass( "jqx-calendar-cell-selected" );
+											});
+							
+							
 						 });
 
 						month=month+1;
@@ -225,8 +209,7 @@ $(document).ready(function ()
 							month=0;
 							year=year+1;
 						}
-			//			console.log("Month num next "+month+"year next " +year);
-						
+		
 					 minDate = new Date(year, month, 1);
 					 maxDate = new Date(year, month+1, 0);
 					 minDate.setHours(minDate.getHours()+parseFloat(5));
@@ -235,21 +218,11 @@ $(document).ready(function ()
 					 maxDate.setMinutes(maxDate.getMinutes()+30);
 					 startDate = minDate.toISOString().replace(".000", ""); //"yyyy-mm-ddThh:mm:ssZ"
 					 endDate = maxDate.toISOString().replace(".000", "");
-					 //console.log("Start "+startDate);
-					 //console.log("End "+endDate);
 					 responseJSON = getchgCalendarData(startDate,endDate);
+					 //responsefilteredJSON = getchgCalendarFilteredData();
+					 
 					});
 					
-		}
-			
-		function SettingsClosed(event)
-		{
-	// User hits OK on the settings page.
-		if (event.closeAction == event.Action.commit)
-			{
-				 //refresh();
-			}
-
 		}
 	
 		function CheckDockState()
@@ -265,8 +238,9 @@ $(document).ready(function ()
 			
 			else
 			{
+			var height = 
 			$('body').css({
-					"height":"500px"
+					"height":"450px"
 					});
 			}
 			System.Gadget.endTransition(System.Gadget.TransitionType.morph, timeTransition);
@@ -297,8 +271,6 @@ $(document).ready(function ()
 			 function FlyoutLoaded(myWin)
 			{
 			var approvedDOM = ActiveFlyout;//$("#"+ActiveFlyout).html();
-			//console.log("AppDOM "+approvedDOM);
-			//console.log("Approved DOM "+approvedDOM);
 			var flyoutDOM;
 			var docDOM;
 			if(IsGadget())	
@@ -314,7 +286,7 @@ $(document).ready(function ()
 			
 			if(flyoutDOM!=null)
 			{
-				//$(flyoutDOM).empty();
+				$(flyoutDOM).empty();
 				$(flyoutDOM).append(approvedDOM);
 			}
 
@@ -322,7 +294,7 @@ $(document).ready(function ()
 			
 			var body = docDOM.body;
 			//var height = 250;
-			var height = 60 + size*30;
+			var height = 40 + size*25;
 			if (height > window.screen.availHeight)
 				height = window.screen.availHeight;
 
@@ -369,7 +341,6 @@ $(document).ready(function ()
 			
 			function highlight()
 			{
-					
 							title=$(this).attr("ows_Title");
 					
 							date1 = new Date();
@@ -389,13 +360,18 @@ $(document).ready(function ()
 												changeDateArr[i]=parseInt(date1parse.getDate());
 												i++;
 										}
-										else
-
-										{
-
-
-										}
-							
+									// else			
+										// {
+										
+												// $(this).hover(
+												// function() {
+													// $(this).addClass( "jqx-calendar-cell-selected" );
+													// }, function() {
+													// $(this).removeClass( "jqx-calendar-cell-selected" );
+													// });
+													
+												// //$(this).css({'background': '#003399','color': '#ff0000'});
+										// }
 						
 					});
 					
@@ -404,7 +380,6 @@ $(document).ready(function ()
 		    /*******  	GET THE DATA FROM SHAREPOINT 		******/
 			function getchgCalendarData(start,end)
 			{
-			
 					//$("#jqxcal").jqxCalendar({ width: '250px', height: '250px', theme:'myTheme'});
 						
 					// $('#jqxcal').bind('valuechanged', function (event) {
@@ -438,7 +413,7 @@ $(document).ready(function ()
 					var i=0;
 					
 					
-					  $(xData.responseXML).SPFilterNode("z:row").each(highlight);  
+				    $(xData.responseXML).SPFilterNode("z:row").each(highlight);  
 					
 					changeDateArr.sort();
 					
@@ -450,12 +425,12 @@ $(document).ready(function ()
 							});
 					}
 					
-				//	console.log("Response in get "+responseJSON);
-					
+					/*****************************************************************/
 					}); 
-				//	console.log("End In getchgcalendardata() res" +responseJSON);
 					return responseJSON;
 			}
+			
+			
 			
 			
 			/*******  	DISPLAY THE FLYOUT ON CLICK 		******/
@@ -464,31 +439,23 @@ $(document).ready(function ()
 			
 						var tableContents="";
 						 
-						//onDateClickText=$(this).text();
 						if(onDateClickText<10){onDateClickText="0"+onDateClickText;}
-					//	console.log("Again "+onDateClickText);	
+					
 						$.each(responseJSON, function (i, cal)
 						{    
 							EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
 							EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
-						//	console.log("EventDate_Arr"+EventDate_Arr[3]);  
-								
+
 							/*******  	DISPLAY THE CLICKED DATE'S CHANGES ON FLYOUT 		******/
 							 if((EventDate_Arr[3]==onDateClickText))
 							 {				 					 
-						//	 console.log("Event = Date "+onDateClickText);
 							 tableContents = tableContents+
 							 "<tr><td>"+ EventDate_Arr[3]+"-"+EventDate_Arr[2]+"-"+EventDate_Arr[1] +"</td>" + "<td>"+cal.LOB+"</td>"+ "<td>"+truncateString(appName,truncateLimit)+"</td>"+'<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID='+cal.ID+'">'+truncateString(cal.LinkTitle,truncateLimit)+'</a></td>'+"</tr>";
 
 							}
-					
-						
 						});
-						//console.log("Table of contents "+tableContents);
 						ActiveFlyout=tableContents; 	
-					//	console.log("Active flyout " +ActiveFlyout);
-						 	
-
+				
 			
 			}   
 
@@ -499,6 +466,7 @@ $(document).ready(function ()
 				return str;
 			}
 	
+			
 			 /*******  	CAML QUERY		******/
 			function getQuery(chgStart, chgEnd)
 			{
@@ -524,3 +492,6 @@ $(document).ready(function ()
 
 				return myQuery;
 			} 
+			
+			
+			

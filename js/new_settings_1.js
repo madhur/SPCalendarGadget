@@ -38,13 +38,15 @@
 					var resJSON=getAppData();
 					//console.log(resJSON);
 					displayAppNames(resJSON);
-					if (IsGadget())
-					{
-						System.Gadget.onSettingsClosing = SettingsClosing;
-						System.Gadget.onSettingsClosed = SettingsClosed;
-					}
-				
+					// if (IsGadget())
+					// {
+						// System.Gadget.onSettingsClosing = SettingsClosing;
+						// System.Gadget.onSettingsClosed = SettingsClosed;
+					// }
+				settingsClosing();
 				getSelectedValues();
+				settignsClosed();
+				
 				// responsefilteredJSON = getchgCalendarFilteredData();
 				
 			}
@@ -54,36 +56,17 @@
 						// System.Gadget.onSettingsClosed = SettingsClosed;	
 					// }
 			
-			function SettingsClosing(event)
+			function SettingsClosing()
 			{
-				if (IsGadget())
-				{
-					// Save the settings if the user clicked OK.
-					if (event.closeAction == event.Action.commit)
-					{
 						setSelectedValues();
+				
+			}
+			function SettingsClosed()
+			{
 						responsefilteredJSON = getchgCalendarFilteredData();
-						System.Gadget.document.parentWindow.settingsHaveChanged();
-					}
-					// Allow the Settings dialog to close.
-					event.cancel = false;
-				}
+				
 			}
 			
-			function SettingsClosed(event)
-			{
-				// User hits OK on the settings page.
-				
-				if (event.closeAction == event.Action.commit)
-				{
-					responsefilteredJSON = getchgCalendarFilteredData();
-				}
-				// User hits Cancel on the settings page.
-				else if (event.closeAction == event.Action.cancel)
-				{
-					SetContentText("canceled");
-				}
-			}
 			
 			function displayAppNames(resJSON)
 			{   
@@ -174,8 +157,8 @@
 				
 				for(var i=0;i<selectedValues2.length;i++)
 				{
-					//console.log("sel2 ="+selectedValues2[i]);
-					System.Gadget.Settings.writeString("app"+i,selectedValues2[i]);
+					console.log("sel2 ="+selectedValues2[i]);
+				//	System.Gadget.Settings.writeString("app"+i,selectedValues2[i]);
 				}
 				
 			}
@@ -187,7 +170,8 @@
 				{
 					for(var i=0;i<3;i++)
 					{
-						var selVal=System.Gadget.Settings.readString("app"+i);
+						//var selVal=System.Gadget.Settings.readString("app"+i);
+						var selVal=selectedValues2[i];
 						if (selVal==null)
 						{
 							selValList.push("nofilter");
@@ -196,35 +180,21 @@
 							selValList.push(selVal);
 					}
 				}
-				// for(var i=0;i<selValList.length;i++)
-					 // $('body').append("sel-- "+selValList[i]);
 				return selValList;
-				
 			}
 	
-			// function getAppNames(responseJSON)
-			// {
-				// var filterList = new Array();
-				// var responseAppNames = new Array();
-				// filterList = getAppFilter();
-				// for(var i=0;i<filterList.length;i++)
-					// $('body').append("f__ "+filterList[i]);
-					
-				// $.each(responseJSON, function (i, cal)
-					// {m
-						// for(var i=0;i<filterList.length;i++)
-						// {
-							// if(filterList[i]!="nofilter")
-							// {
-								// responseAppNames.push(cal.AIM_x0020_Name);
-							// }
-						// }
-					// });
-				
-				// // for(var i=0;i<responseAppNames.length;i++)
-					// // $('body').append("res "+responseAppNames[i]);
-				// return responseAppNames;
-			// }
+			function getAppNames(responseJSON)
+			{
+				var filterList = new Array();
+				var responseAppNames = new Array();
+				filterList = getAppFilter();
+				for(var i=0;i<filterList.length;i++)
+				{
+					if(filterList[i]!="nofilter")
+						responseAppNames.push(responseJSON.AIM_x0020_Name);
+				}
+				return responseAppNames;
+			}
 	
 			/*******  	CAML QUERY		******/
 		    function getQuery()
@@ -242,11 +212,10 @@
 			function getchgCalendarFilteredData()
 			{
 				var filteredQuery;
-				filteredAppNames = getAppFilter();
-				//filteredAppNames = getAppNames(responseJSON);
+				filteredAppNames = getAppNames(responseJSON);
 				filteredQuery = getfilteredQuery(filteredAppNames);
-				//$('body').append(filteredAppNames);
-				$('body').append(filteredQuery);
+				
+				$('body').append("In chgcalendarfilter");
 				
 				$().SPServices({
 					operation:"GetListItems",
@@ -278,7 +247,6 @@
 					}
 				
 					}); 
-				//	$('body').append(responsefilteredJSON);
 					return responsefilteredJSON;
 			}
 
