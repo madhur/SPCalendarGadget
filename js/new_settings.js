@@ -14,25 +14,26 @@ var responseJSON, responsefilteredJSON, date1, date2, title, onDateClickText, da
 var selectedValues1 = new Array();
 var selectedValues2 = new Array();
 var selectedValues = new Array();
+var allValues = new Array();
 var appSelectOptions = "";
 var i, j;
 var appNamesDistinct = new Array();
 var filteredAppNames = new Array();
+var flag=0;
 
+$("#appSelect").css("overflow", "auto");
 
 function initLoad()
 {
-
 	var resJSON = getAppData();
 	displayAppNames(resJSON);
 	if (IsGadget())
 	{
 		System.Gadget.onSettingsClosing = SettingsClosing;
 
-	}
-
+	} 
 	getSelectedValues();
-
+	
 }
 
 function SettingsClosing(event)
@@ -42,16 +43,20 @@ function SettingsClosing(event)
 		// Save the settings if the user clicked OK.
 		if (event.closeAction == event.Action.commit)
 		{
-			setSelectedValues();
-
+			if(flag==1)
+				onReset();
+			else
+				setSelectedValues();
+			
 			System.Gadget.document.parentWindow.settingsHaveChanged();
 		}
 		// Allow the Settings dialog to close.
+	
+		flag=0;
 		event.cancel = false;
 	}
+	
 }
-
-
 
 function displayAppNames(resJSON)
 {
@@ -124,6 +129,7 @@ function IsGadget()
 
 function getSelectedValues()
 {
+	selectedValues1 = new Array();
 	for (var i = 0; i < 4; i++)
 	{
 		var selectedVal = System.Gadget.Settings.readString("app" + i);
@@ -135,18 +141,38 @@ function getSelectedValues()
 
 function setSelectedValues()
 {
+	selectedValues2 = new Array();
 	$('#appSelect').find('option:selected').each(function()
 	{
 		selectedValues2.push($(this).text());
 	});
 
 	for (var i = 0; i < selectedValues2.length; i++)
-	{
-		System.Gadget.Settings.writeString("app" + i, selectedValues2[i]);
-	}
-
+		{
+			System.Gadget.Settings.writeString("app" + i, selectedValues2[i]);
+		}
 }
 
+function ResetSelection()
+	{
+		flag=1;
+		$("#appSelect > option").prop("selected", false);
+	}
+
+function onReset()
+{
+	allValues = new Array();
+	$('#appSelect').find('option').each(function()
+		{
+			allValues.push($(this).text());
+		});
+		
+		for (var i = 0; i < allValues.length; i++)
+		{
+			System.Gadget.Settings.writeString("app" + i, allValues);
+		}
+}
+	
 function getAppFilter()
 {
 	var selValList = new Array();
@@ -163,11 +189,9 @@ function getAppFilter()
 				selValList.push(selVal);
 		}
 	}
-	// for(var i=0;i<selValList.length;i++)
-	// $('body').append("sel-- "+selValList[i]);
 	return selValList;
-
 }
+
 
 /*******  	CAML QUERY		******/
 function getQuery()
@@ -182,6 +206,35 @@ function getQuery()
 }
 
 
+function OnDivScroll()
+{
+    var listappSelect = document.getElementById("appSelect");
+
+    if (listappSelect.options.length > 8)
+    {
+        listappSelect.size=listappSelect.options.length;
+    }
+    else
+    {
+        listappSelect.size=8;
+    }
+}
+
+function OnSelectFocus()
+{
+    if (document.getElementById("appSelectDiv").scrollLeft != 0)
+    {
+        document.getElementById("appSelectDiv").scrollLeft = 0;
+    }
+
+    var listappSelect = document.getElementById("appSelect");
+    if( listappSelect.options.length > 8)
+    {
+        listappSelect.focus();
+        listappSelect.size=8;
+    }
+}
+
 function formatOWSItem(item, idx)
 {
 	var tmpStr = "";
@@ -192,6 +245,7 @@ function formatOWSItem(item, idx)
 	}
 	else
 	{
+
 		tmpStr = item.split(';#');
 		return tmpStr[idx];
 	}

@@ -1,8 +1,7 @@
 body
 {
-	width:500px;
-	height:250px;
-	
+width:2000px;
+height:250px;
 }
 
 #theader
@@ -13,13 +12,14 @@ body
 
 table#tblappSelect
 {
-	width:100%;
+	
 }
 
 #appSelect
 {
-	width:100%;
-	
 	height:150px;
+	overflow-x:scroll;
+	overflow-y:scroll;
 }
+
 

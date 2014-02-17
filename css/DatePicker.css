@@ -60,7 +60,7 @@ color:rgb(117,122,100);
 }
 
 .tblSPContent_class {
-	margin:0px;padding:2px;
+	margin:0px;padding:0px;
 	/*border:1px solid #ffffff;*/
 	width:250px;
 	table-layout:fixed;
@@ -91,7 +91,7 @@ color:rgb(117,122,100);
     border-spacing: 1px;
 	width:250px;
 	height:500px;
-	margin:0px;padding:2px;
+	margin:0px;padding:0px;
 	overflow-x:scroll;
 	overflow-y:scroll;
 

@@ -14,7 +14,11 @@ body, #jqxcal
 	word-wrap: break-word;
 	text-overflow:ellipsis;
 	/* overflow-x:scroll; */
-
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
+	
 	-moz-border-radius-bottomleft:1px;
 	-webkit-border-bottom-left-radius:1px;
 	border-bottom-left-radius:1px;
@@ -35,30 +39,54 @@ body, #jqxcal
     border-spacing: 0;
 	width:250px;
 	height:500px;
-	margin:0px;padding:0px;
+	margin:0px;
+	padding:0px;
 	/* overflow-y:scroll; */
-
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
     display:block;
 }.f_tblSPContent_class tr:last-child td:last-child {
 	-moz-border-radius-bottomright:1px;
 	-webkit-border-bottom-right-radius:1px;
 	border-bottom-right-radius:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 }
 .f_tblSPContent_class table tr:first-child td:first-child {
 	-moz-border-radius-topleft:1px;
 	-webkit-border-top-left-radius:1px;
 	border-top-left-radius:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 }
 .f_tblSPContent_class table tr:first-child td:last-child {
 	-moz-border-radius-topright:1px;
 	-webkit-border-top-right-radius:1px;
 	border-top-right-radius:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 }.f_tblSPContent_class tr:last-child td:first-child{
 	-moz-border-radius-bottomleft:1px;
 	-webkit-border-bottom-left-radius:1px;
 	border-bottom-left-radius:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 }.f_tblSPContent_class tr:hover td{
 	background-color:#ffffff;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 }
 .f_tblSPContent_class th{
 	vertical-align:middle;
@@ -68,11 +96,15 @@ body, #jqxcal
 	border:0px solid #ffffff;
 	border-width:1px 0px 0px 1px;
 	text-align:left;
-	padding:1px;
+	/* padding:1px; */
 	font-size:10px;
 	font-family:Verdana;
 	font-weight:bold;
 	color:#070000;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 }
 
 .f_tblSPContent_class td{
@@ -83,11 +115,15 @@ body, #jqxcal
 	border:0px solid #ffffff;
 	border-width:1px 0px 0px 1px;
 	text-align:left;
-	padding:1px;
+	/* padding:1px; */
 	font-size:9px;
 	font-family:Verdana;
 	font-weight:normal;
 	color:#070000;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
 
 }.f_tblSPContent_class tr:last-child td{
 	border-width:0px 1px 0px 0px;
@@ -136,7 +172,7 @@ body, #jqxcal
 	margin-top: 0px;
 	margin-bottom: 0px;
 	padding-top: 0px;
-	padding-bottom: 1px;
+	padding-bottom: 0px;
 	text-align:center;
 	
 }
@@ -144,5 +180,5 @@ body, #jqxcal
 .title div 
 {
 
-	padding-top:5px;
+	padding-top:0px;
 }

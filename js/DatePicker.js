@@ -15,14 +15,31 @@
     var truncateLimit = 7;
     var gadgetHeight = '250px';
     var gadgetWidth = '250px';
-    var expandedHeight = '450px';
+    var expandedHeight ;
     var globalCurrentMonth, globalCurrentYear;
-
+	var filteredAppNames;
+	var DefaultHeight = 275;
+	var upcomingBarHeight=25;
+	var rowHeight = 27;
+//	var flag=0;
+	
     function IsGadget()
     {
     	return (window.System != undefined);
     }
 
+    function init()
+    {
+    	if (IsGadget())
+    	{
+    		System.Gadget.settingsUI = "Settings.html";
+    		System.Gadget.onDock = CheckDockState;
+    		System.Gadget.onUndock = CheckDockState;
+    		System.Gadget.Flyout.file = "flyout.html";
+    		System.Gadget.Flyout.show = false;
+		}
+    }
+	
     $(document).ready(function()
     {
     	$("#jqxcal").jqxCalendar(
@@ -36,6 +53,82 @@
     	});
 
     	refresh();
+		
+		$('#jqxcal').on('backButtonClick', function()
+    	{
+			var now = new Date();
+    		globalCurrentMonth = globalCurrentMonth - 1;
+
+    		if (globalCurrentMonth == -1)
+    		{
+    			globalCurrentMonth = 11;
+    			globalCurrentYear = globalCurrentYear - 1;
+    		}
+    		if (globalCurrentMonth == 12)
+    		{
+    			globalCurrentMonth = 0;
+    			globalCurrentYear = globalCurrentYear + 1;
+    		}
+
+    		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
+    		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
+    		var responseJSON = getCalendarDates(startDate, endDate);
+			
+			var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
+			var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
+			var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
+			
+			nextFiveChanges(responseJSON_upcoming);	
+    		
+			$("#cellTableViewjqxcal td").each(function()
+    		{
+    			if ($(this).css("visibility") == "hidden")
+    			{}
+    			else
+    				doDateBindings(this, responseJSON);
+    		});
+
+    	});
+		
+
+    	$('#jqxcal').on('nextButtonClick', function()
+    	{
+			var now = new Date();
+    		globalCurrentMonth = globalCurrentMonth + 1;
+
+    		if (globalCurrentMonth == -1)
+    		{
+    			globalCurrentMonth = 11;
+    			globalCurrentYear = globalCurrentYear - 1;
+    		}
+    		if (globalCurrentMonth == 12)
+    		{
+    			globalCurrentMonth = 0;
+    			globalCurrentYear = globalCurrentYear + 1;
+    		}
+
+    		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
+    		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)			
+    		var responseJSON = getCalendarDates(startDate, endDate);
+
+			var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
+			var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
+			var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
+			
+			nextFiveChanges(responseJSON_upcoming);	
+
+    		$("#cellTableViewjqxcal td").each(function()
+    		{
+    			if ($(this).css("visibility") == "hidden")
+    			{}
+    			else
+    				doDateBindings(this, responseJSON);
+
+    		});
+			
+    	});
+		
+		
 
     });
 
@@ -53,23 +146,24 @@
     	maxDate.setHours(maxDate.getHours() + parseFloat(5));
     	maxDate.setMinutes(maxDate.getMinutes() + 30);
     	return maxDate.toISOString().replace(".000", "");
-
     }
 
     function refresh()
     {
-
     	var now = new Date();
-    	globalCurrentMonth = now.getMonth();
-    	globalCurrentYear = now.getFullYear();
+		
+		if(typeof globalCurrentMonth=="undefined")
+			globalCurrentMonth = now.getMonth();
+		if(typeof globalCurrentYear=="undefined")	
+			globalCurrentYear = now.getFullYear();
 
     	var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
     	var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
-
+		
     	var responseJSON = getCalendarDates(startDate, endDate);
-
-    	nextFiveChanges(responseJSON);
-
+		
+		nextFiveChanges(responseJSON);
+		
     	$("#cellTableViewjqxcal td").each(function()
     	{
     		if ($(this).css("visibility") == "hidden")
@@ -81,84 +175,11 @@
     			doDateBindings(this, responseJSON);
     		}
     	});
-
-    	$('#jqxcal').on('backButtonClick', function()
-    	{
-
-    		// year = now.getFullYear();
-    		globalCurrentMonth = globalCurrentMonth - 1;
-
-    		if (globalCurrentMonth == -1)
-    		{
-    			globalCurrentMonth = 11;
-    			globalCurrentYear = globalCurrentYear - 1;
-    		}
-    		if (globalCurrentMonth == 12)
-    		{
-    			globalCurrentMonth = 0;
-    			globalCurrentYear = globalCurrentYear + 1;
-    		}
-
-    		//console.log(month);
-    		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
-    		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
-    		var responseJSON = getCalendarDates(startDate, endDate);
-
-    		$("#cellTableViewjqxcal td").each(function()
-    		{
-    			if ($(this).css("visibility") == "hidden")
-    			{}
-    			else
-    				doDateBindings(this, responseJSON);
-
-    		});
-
-    	});
-
-
-    	$('#jqxcal').on('nextButtonClick', function()
-    	{
-    		// year = now.getFullYear();
-
-    		globalCurrentMonth = globalCurrentMonth + 1;
-
-    		if (globalCurrentMonth == -1)
-    		{
-    			globalCurrentMonth = 11;
-    			globalCurrentYear = globalCurrentYear - 1;
-    		}
-    		if (globalCurrentMonth == 12)
-    		{
-    			globalCurrentMonth = 0;
-    			globalCurrentYear = globalCurrentYear + 1;
-    		}
-
-    		// console.log(month);
-    		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
-    		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
-
-
-    		var responseJSON = getCalendarDates(startDate, endDate);
-
-
-    		$("#cellTableViewjqxcal td").each(function()
-    		{
-
-    			if ($(this).css("visibility") == "hidden")
-    			{}
-    			else
-    				doDateBindings(this, responseJSON);
-
-    		});
-
-    	});
-
+		
     }
-
 
     function doDateBindings(tdelem, responseJSON)
     {
-
     	$(tdelem).css(
     	{
     		'background': 'transparent',
@@ -171,7 +192,7 @@
     	{
 
     		EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
-
+			
     		var tdText = $(tdelem).text();
     		if (tdText < 10)
     		{
@@ -195,15 +216,6 @@
     		'cursor': 'pointer'
     	});
 
-    	$(elem).hover(
-    		function()
-    		{
-    			$(elem).addClass("jqx-calendar-cell-selected");
-    		}, function()
-    		{
-    			$(elem).removeClass("jqx-calendar-cell-selected");
-    		});
-
     	var tdonclick = function(ev)
     	{
     		ev.preventDefault();
@@ -215,29 +227,12 @@
     	}
 
     	$(elem).bind('click', tdonclick);
-
     }
 
     function settingsHaveChanged()
     {
-
     	refresh();
-
-    }
-
-    function init()
-    {
-    	if (IsGadget())
-    	{
-    		System.Gadget.settingsUI = "Settings.html";
-    		System.Gadget.onDock = CheckDockState;
-    		System.Gadget.onUndock = CheckDockState;
-    		System.Gadget.Flyout.file = "flyout.html";
-    		System.Gadget.Flyout.show = false;
-
-    	}
-
-    }
+	}
 
     function showFlyout(onDateClickText, responseJSON)
     {
@@ -311,16 +306,14 @@
     	});
 
     	$(body).css("overflow", "auto");
-
     }
 
-    $("#upcomingdiv").css("overflow", "auto");
-
-
-
+   $("#upcomingdiv").css("overflow", "auto");
+	
     function FlyoutLoaded(myWin)
     {
-    	var approvedDOM = ActiveFlyout; //$("#"+ActiveFlyout).html();
+		
+    	var approvedDOM = ActiveFlyout; 
     	var flyoutDOM;
     	var docDOM;
     	if (IsGadget())
@@ -343,8 +336,8 @@
     	var size = $(flyoutDOM).find('tr').size();
 
     	var body = docDOM.body;
-    	//var height = 250;
-    	var height = 40 + size * 25;
+    	
+    	var height = 50+size * 25;
     	if (height > window.screen.availHeight)
     		height = window.screen.availHeight;
 
@@ -352,47 +345,130 @@
 
     }
 
-
     /*******  	DISPLAY THE NEXT FIVE CHANGES 		******/
     function nextFiveChanges(responseJSON)
     {
     	$('#tblSPContent').empty();
-    	var count = 0;
+		filteredAppNames = new Array();
+		
+			filteredAppNames = getAppFilter();
+		
+		var upcomingContents="";
+    	var count = 0; var currDate; var j=0;
+		var sortedDates = new Array();
+		var sortedDates_1 = new Array();
+		var contentsArr = new Array();
+		var indexOrder = new Array(); 
+		 
+		 
+		/********* Sort the chg Date ******/ 
+		$.each(responseJSON, function(i, cal)
+    	{	
+			EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+			var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
+			currDate = new Date();
+			appName = cal.AIM_x0020_Name.split(';#')[1];	
+			
+			if((EventDate_Formatted.getTime() >= currDate.getTime()))
+			{
+			  sortedDates.push(cal.EventDate.split(' ')[0]);
+			}
+		});
+		
+		sortedDates.sort();
+	
+		for(var k=0;k<sortedDates.length;k++)	
+			sortedDates_1[k]=sortedDates[k];
+			
+		/* Map the remaining columns as per the sorted dates */	
     	$.each(responseJSON, function(i, cal)
     	{
-    		EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+			EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
     		EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
     		var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
-    		var currDate = new Date();
-    		currDate.setDate(currDate.getDate() - 2);
+			appName = cal.AIM_x0020_Name.split(';#')[1];			  
+    		currDate = new Date();
+			var idx=sortedDates_1.length-1;
+		
+			while(idx>=0)
+			{
+			 if(EventDate_Arr[3]==sortedDates_1[idx].split('-')[2])
+				{
+					indexOrder[j++]=idx;
+					
+					contentsArr.push("</td>" + "<td>" + cal.LOB.trim() + "</td><td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>");
+					
+					sortedDates_1.splice(idx,1);
 
-    		appName = cal.AIM_x0020_Name.substr(5, (cal.AIM_x0020_Name.length - 1));
+					break;
+				}
+			idx=idx-1;
+			}
+		});
+		
+		
+		/* Append the contents to the table component - upcoming changes */
+		for(var k=0;k<sortedDates.length;k++)
+		{
+					upcomingContents =
+						"<tr><td>" + sortedDates[k]+contentsArr[indexOrder.indexOf(k)];
 
-    		if ((EventDate_Formatted >= currDate))
-    		{
-    			upcomingContents =
-    				"<tr><td>" + EventDate_Arr[3] + "-" + EventDate_Arr[2] + "-" + EventDate_Arr[1] + "</td>" + "<td>" + cal.LOB.trim() + "</td><td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
+						count = count + 1;
 
-    			count = count + 1;
+						if (count <= 5)
+						{
+							$('#tblSPContent').append(upcomingContents);
+						}
+						else
+							return false;
+				
+    	}
+		
+		var rowCount = $("#tblSPContent").find('tr').size();
+		if(count==0)
+		{
+			expandedHeight=DefaultHeight;
+			$('.title div').html("No Upcoming Changes");
+		}
+		else
+		{
+			expandedHeight = DefaultHeight+upcomingBarHeight+parseInt(rowCount*rowHeight);
+			$('.title div').html("Upcoming Changes");
+		}
+	}
+	
+	function getAppFilter()
+			{
+				var selValList = new Array();				
+				if (IsGadget())
+				{
+					for(var i=0;i<3;i++)
+					{
+						var selVal=System.Gadget.Settings.readString("app"+i);					
+						if (selVal=="")
+						{
+							//selValList.push("nofilter");
+						}	
+						else
+							selValList.push(selVal);
+					}
+				}
 
-    			if (count <= 5)
-    			{
-    				$('#tblSPContent').append(upcomingContents);
-    			}
-
-    		}
-
-    	});
-
-    }
-
+				return selValList;
+				
+			}
     /*******  	GET THE DATA FROM SHAREPOINT 		******/
     function getCalendarDates(start, end)
     {
-    	var responseJSON;
+    	var responseJSON,myQuery;
+		filteredAppNames = new Array();
+		
     	var functionStatus;
-    	var myQuery = getQuery(start, end);
 
+			filteredAppNames = getAppFilter();
+		
+		myQuery = getfilteredQuery(start,end,filteredAppNames);
+			
     	$().SPServices(
     	{
     		operation: "GetListItems",
@@ -402,7 +478,7 @@
     		CAMLQuery: myQuery,
     		completefunc: function(xData, Status)
     		{
-    			changeDateArr.sort();
+    			// changeDateArr.sort();
 
     			responseJSON = $(xData.responseXML).SPFilterNode("z:row").SPXmlToJson(
     			{
@@ -414,8 +490,7 @@
 
     		/*****************************************************************/
     	});
-
-    	//console.log(responseJSON);
+		flag=0;
     	return responseJSON;
     }
  
@@ -426,29 +501,112 @@
     	return str;
     }
 
+	// function ResetSelection()
+	// {
+		// flag=1;
+		// $("#appSelect > option").prop("selected", false);
+		// refresh();
+	// }
+	
+	function getfilteredQuery(chgStart,chgEnd,filteredAppNames)
+			{
+				var myfilteredQuery; 
+				
+			/********** Changes of selected applications **********/
+				
+				if(filteredAppNames.length==0)
+				{
+					myfilteredQuery =
+					"<Query>" +
+						"<Where><And>" +
+							"<Geq>" +
+								"<FieldRef Name='EventDate'/>" +
+								"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgStart + "</Value>" +
+							"</Geq>" +
+							"<Leq>" +
+								"<FieldRef Name='EndDate'/>" +
+								"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgEnd + "</Value>" +
+							"</Leq>" +
+						"</And></Where>" +
+					"</Query>";
+				}
+				
+				else if(filteredAppNames.length==1)
+				{
+					myfilteredQuery = 
+						"<Query>" +
+							"<Where><And>"+
+								"<And>" +
+								"<Geq>" +
+									"<FieldRef Name='EventDate'/>" +
+									"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgStart + "</Value>" +
+								"</Geq>" +
+								"<Leq>" +
+									"<FieldRef Name='EndDate'/>" +
+									"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgEnd + "</Value>" +
+								"</Leq>" +
+								"</And>"+
+								"<Eq>" +
+									"<FieldRef Name='AIM_x0020_Name'/>" +
+									"<Value Type='Text'>"+filteredAppNames[0]+"</Value>" +
+								"</Eq>" +
+							"</And>"+
+							"</Where>" +
+						"</Query>"; 
+				}
+				else if(filteredAppNames.length==2)
+				{
+					myfilteredQuery = 
+					"<Query>"+
+					"<Where><And>"+
+						"<And>"+
+								"<Geq>" +
+									"<FieldRef Name='EventDate'/>" +
+									"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgStart + "</Value>" +
+								"</Geq>" +
+								"<Leq>" +
+									"<FieldRef Name='EndDate'/>" +
+									"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgEnd + "</Value>" +
+								"</Leq>" +
+						"</And>"+	
+						"<In>"+
+							"<FieldRef Name='AIM_x0020_Name'/>"+
+							"<Values>"+
+								"<Value Type='Text'>"+filteredAppNames[0]+"</Value>"+
+								"<Value Type='Text'>"+filteredAppNames[1]+"</Value>"+
+							"</Values>"+
+						"</In>"+
+					"</And>"+
+					"</Where>"+
+					"</Query>";
+				}
+				else if(filteredAppNames.length==3)
+				{
+					myfilteredQuery = 
+					"<Query>"+
+					"<Where><And>"+
+							"<And>"+
+								"<Geq>" +
+									"<FieldRef Name='EventDate'/>" +
+									"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgStart + "</Value>" +
+								"</Geq>" +
+								"<Leq>" +
+									"<FieldRef Name='EndDate'/>" +
+									"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgEnd + "</Value>" +
+								"</Leq>" +
+							"</And>"+
+						"<In>"+
+							"<FieldRef Name='AIM_x0020_Name'/>"+
+							"<Values>"+
+								"<Value Type='Text'>"+filteredAppNames[0]+"</Value>"+
+								"<Value Type='Text'>"+filteredAppNames[1]+"</Value>"+
+								"<Value Type='Text'>"+filteredAppNames[2]+"</Value>"+
+							"</Values>"+
+						"</In>"+
+					"</And>"+
+					"</Where>"+
+					"</Query>";
+				}
 
-    /*******  	CAML QUERY		******/
-    function getQuery(chgStart, chgEnd)
-    {
-    	var myQuery;
-
-    	/********** Changes during a given Date Range **********/ //YYYY-MM-DDTHH:mm:ss.sssZ
-
-    	myQuery =
-    		"<Query>" +
-    		"<Where> <And>" +
-    		"<Geq>" +
-    		"<FieldRef Name='EventDate'/>" +
-    		"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgStart + "</Value>" +
-    	//*********HARDCODED - Date range to be selected by the user
-    	"</Geq>" +
-    		"<Leq>" +
-    		"<FieldRef Name='EndDate'/>" +
-    		"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgEnd + "</Value>" +
-    		"</Leq>" +
-    		"</And> </Where>" +
-    		"</Query>";
-    	//
-
-    	return myQuery;
-    }
+				return myfilteredQuery;
+			} 
