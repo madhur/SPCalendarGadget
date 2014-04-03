@@ -18,6 +18,11 @@ body, #jqxcal
 	font-style:bold;
 }
 
+.flyoutrow
+{
+	height:20px;
+}
+
 #upcomingTbl
 {
 	height:250px;
@@ -135,10 +140,11 @@ color:rgb(117,122,100);
 	border-width:1px 0px 0px 1px;
 	text-align:left;
 	padding:1px;
-	font-size:10px;
+	font-size:9px;
 	font-family:Verdana;
 	font-weight:bold;
 	color:#070000;
+	
 }
 
 .tblSPContent_class td{
@@ -192,7 +198,7 @@ color:rgb(117,122,100);
 
 .tblHeader_class
 {
-	font-size:9px;
+	font-size:8px;
 	margin: 0px;
 	border-spacing:0px;
 	text-align:center;

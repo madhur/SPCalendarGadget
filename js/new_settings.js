@@ -33,7 +33,6 @@ function initLoad()
 
 	} 
 	getSelectedValues();
-	
 }
 
 function SettingsClosing(event)
@@ -42,20 +41,15 @@ function SettingsClosing(event)
 	{
 		// Save the settings if the user clicked OK.
 		if (event.closeAction == event.Action.commit)
-		{
-			if(flag==1)
-				onReset();
-			else
-				setSelectedValues();
+		{	
+			setSelectedValues();
 			
 			System.Gadget.document.parentWindow.settingsHaveChanged();
 		}
 		// Allow the Settings dialog to close.
-	
-		flag=0;
+
 		event.cancel = false;
 	}
-	
 }
 
 function displayAppNames(resJSON)
@@ -117,7 +111,6 @@ function getAppData()
 		}
 
 	});
-
 	return responseJSON;
 }
 
@@ -130,9 +123,13 @@ function IsGadget()
 function getSelectedValues()
 {
 	selectedValues1 = new Array();
-	for (var i = 0; i < 4; i++)
+	for (var i = 0; i < 3; i++)
 	{
-		var selectedVal = System.Gadget.Settings.readString("app" + i);
+		var selectedVal;
+		if (IsGadget())
+		{
+			selectedVal = System.Gadget.Settings.readString("app" + i);
+		}
 		selectedValues1.push(selectedVal);
 		$("#appSelect option[value='" + selectedVal + "']").attr('selected', true);
 	}
@@ -141,57 +138,53 @@ function getSelectedValues()
 
 function setSelectedValues()
 {
+	var count =0 ; var appChosen=0;
 	selectedValues2 = new Array();
 	$('#appSelect').find('option:selected').each(function()
 	{
-		selectedValues2.push($(this).text());
+		count=count+1;
+		if(count<=3)
+			selectedValues2.push($(this).text());
+		else
+			{
+				appChosen=1;
+			}
 	});
+	
+	if(appChosen==1)
+		{
+			window.prompt("Choose a maximum of three applications", "Click on settings again to select app names");
+			$("#appSelect > option").prop("selected", false);
+			selectedValues2 = new Array();
+		}
 
+	if(selectedValues2.length==0)
+		onReset();
+		
 	for (var i = 0; i < selectedValues2.length; i++)
 		{
-			System.Gadget.Settings.writeString("app" + i, selectedValues2[i]);
+			if (IsGadget())
+			{
+				System.Gadget.Settings.writeString("app" + i, selectedValues2[i]);
+			}
 		}
 }
 
 function ResetSelection()
 	{
-		flag=1;
 		$("#appSelect > option").prop("selected", false);
 	}
 
 function onReset()
 {
-	allValues = new Array();
-	$('#appSelect').find('option').each(function()
-		{
-			allValues.push($(this).text());
-		});
-		
-		for (var i = 0; i < allValues.length; i++)
-		{
-			System.Gadget.Settings.writeString("app" + i, allValues);
-		}
-}
-	
-function getAppFilter()
-{
-	var selValList = new Array();
-	if (IsGadget())
-	{
 		for (var i = 0; i < 3; i++)
 		{
-			var selVal = System.Gadget.Settings.readString("app" + i);
-			if (selVal == null)
+			if (IsGadget())
 			{
-				selValList.push("nofilter");
+				System.Gadget.Settings.writeString("app" + i,"");
 			}
-			else
-				selValList.push(selVal);
 		}
-	}
-	return selValList;
 }
-
 
 /*******  	CAML QUERY		******/
 function getQuery()

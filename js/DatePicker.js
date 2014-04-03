@@ -20,8 +20,8 @@
 	var filteredAppNames;
 	var DefaultHeight = 275;
 	var upcomingBarHeight=25;
-	var rowHeight = 27;
-//	var flag=0;
+	var rowHeight = 13;
+	var flag =0 ;
 	
     function IsGadget()
     {
@@ -42,7 +42,7 @@
 	
     $(document).ready(function()
     {
-    	$("#jqxcal").jqxCalendar(
+    	$('#jqxcal').jqxCalendar(
     	{
     		width: gadgetHeight,
     		height: gadgetWidth,
@@ -74,11 +74,12 @@
     		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
     		var responseJSON = getCalendarDates(startDate, endDate);
 			
-			var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
-			var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
-			var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
+			// var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
+			// var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
+			// var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
 			
-			nextFiveChanges(responseJSON_upcoming);	
+			// var responseJSON_upcoming = getUpcomingChanges();
+			// nextFiveChanges(responseJSON_upcoming);	
     		
 			$("#cellTableViewjqxcal td").each(function()
     		{
@@ -111,11 +112,12 @@
     		var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)			
     		var responseJSON = getCalendarDates(startDate, endDate);
 
-			var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
-			var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
-			var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
+			// var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
+			// var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
+			// var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
 			
-			nextFiveChanges(responseJSON_upcoming);	
+			// var responseJSON_upcoming = getUpcomingChanges();
+			// nextFiveChanges(responseJSON_upcoming);	
 
     		$("#cellTableViewjqxcal td").each(function()
     		{
@@ -151,19 +153,27 @@
     function refresh()
     {
     	var now = new Date();
+		var startDate, endDate;
 		
-		if(typeof globalCurrentMonth=="undefined")
+		if(typeof globalCurrentMonth=="undefined")// || globalCurrentMonth=="" || globalCurrentMonth == null)
 			globalCurrentMonth = now.getMonth();
-		if(typeof globalCurrentYear=="undefined")	
+		if(typeof globalCurrentYear=="undefined")// || globalCurrentY=="" || globalCurrentYear == null)	
 			globalCurrentYear = now.getFullYear();
 
-    	var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
-    	var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)
+
+		var startDate = getminFormattedDate(globalCurrentMonth, globalCurrentYear)
+    	var endDate = getmaxFormattedDate(globalCurrentMonth, globalCurrentYear)		
+		var responseJSON = getCalendarDates(startDate, endDate);
+	//	nextFiveChanges(responseJSON);
 		
-    	var responseJSON = getCalendarDates(startDate, endDate);
+		var startDate_upcoming = getminFormattedDate(now.getMonth(),now.getFullYear());	
+		var endDate_upcoming = getmaxFormattedDate(now.getMonth(),now.getFullYear());	
+		// var responseJSON_upcoming = getCalendarDates(startDate_upcoming, endDate_upcoming);
 		
-		nextFiveChanges(responseJSON);
-		
+		var responseJSON_upcoming = getUpcomingChanges();
+		//console.log("Response JSON Upcoming "+responseJSON_upcoming);
+		nextFiveChanges(responseJSON_upcoming);			
+    	
     	$("#cellTableViewjqxcal td").each(function()
     	{
     		if ($(this).css("visibility") == "hidden")
@@ -231,6 +241,7 @@
 
     function settingsHaveChanged()
     {
+		flag=1;
     	refresh();
 	}
 
@@ -247,13 +258,13 @@
         {
             EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
             EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
-
+			appName = cal.AIM_x0020_Name.split(';#')[1];
             /*******    DISPLAY THE CLICKED DATE'S CHANGES ON FLYOUT        ******/
             if ((EventDate_Arr[3] == onDateClickText))
             {
                 tableContents = tableContents +
-                    "<tr><td>" + EventDate_Arr[3] + "-" + EventDate_Arr[2] + "-" + EventDate_Arr[1] + "</td>" + "<td>" + cal.LOB + "</td>" + "<td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
-
+                    "<tr class='flyoutrow'><td>" + EventDate_Arr[2]+"/"+EventDate_Arr[3]+"/"+EventDate_Arr[1].toString().substr(2,2) + "</td>" + "<td>" + cal.LOB + "</td>" + "<td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
+					
             }
         });
 
@@ -312,7 +323,6 @@
 	
     function FlyoutLoaded(myWin)
     {
-		
     	var approvedDOM = ActiveFlyout; 
     	var flyoutDOM;
     	var docDOM;
@@ -337,7 +347,9 @@
 
     	var body = docDOM.body;
     	
-    	var height = 50+size * 25;
+    	//var height = 41+size * 13;
+		var height = 41+size *20;
+		
     	if (height > window.screen.availHeight)
     		height = window.screen.availHeight;
 
@@ -346,96 +358,221 @@
     }
 
     /*******  	DISPLAY THE NEXT FIVE CHANGES 		******/
-    function nextFiveChanges(responseJSON)
+    // function nextFiveChanges(responseJSON)
+    // {
+		// var repeated =0;
+    	// $('#tblSPContent').empty();
+		// filteredAppNames = new Array();
+		// filteredAppNames = getAppFilter();
+		
+		// var upcomingContents="";
+    	// var count = 0; var currDate; var j=0;
+		// var sortedDates = new Array();
+		// var sortedDates_1 = new Array();
+		// var contentsArr = new Array();
+		// var indexOrder = new Array(); 
+		 
+		 
+		// /********* Sort the chg Date ******/ 
+		// $.each(responseJSON, function(i, cal)
+    	// {	
+			// EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+			// var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
+			// currDate = new Date();
+			// currDate.setDate(currDate.getDate()-1);
+			// appName = cal.AIM_x0020_Name.split(';#')[1];	
+			
+			// if((EventDate_Formatted.getTime() >= currDate.getTime()))
+			// {
+			  // sortedDates.push(cal.EventDate.split(' ')[0]);
+			// }
+		// });
+		
+		// sortedDates.sort();
+		// console.log(sortedDates);
+		// for(var k=0;k<sortedDates.length;k++)	
+			// sortedDates_1[k]=sortedDates[k];
+			
+		// /* Map the remaining columns as per the sorted dates */	
+    	// $.each(responseJSON, function(i, cal)
+    	// {
+			// EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+    		// EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+    		// var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
+			// appName = cal.AIM_x0020_Name.split(';#')[1];			  
+    		// currDate = new Date();
+			// var idx=0;
+		
+		
+			// while(idx<=sortedDates_1.length-1 && sortedDates_1[idx]!=null)
+			// {
+			// console.log("idx = "+idx);
+			// console.log("EventDate "+EventDate_Arr[3]+" SortedDates "+sortedDates_1[idx].split('-')[2]);
+			 // if(EventDate_Arr[3]==sortedDates_1[idx].split('-')[2])
+				// {
+					// // console.log("EventDate "+EventDate_Arr[3]+" SortedDates "+sortedDates_1[idx].split('-')[2]);
+					// indexOrder[j++]=idx;
+					
+					// contentsArr.push("</td>" + "<td>" + cal.LOB.trim() + "</td><td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>");
+					
+					// //If there are repeated dates
+					
+					// // for(var i=0;i<sortedDates_1.length;i++)
+						// // {
+							// // console.log("Comparing idx = "+idx);
+							// // if(sortedDates_1[idx]!=null && sortedDates_1[i]!=null)
+							// // {
+							// // if(idx!=i && (sortedDates_1[idx].split('-')[2]==sortedDates_1[i].split('-')[2]))
+								// // {
+								
+								 // // repeated=1;
+								 // // break;
+								// // }
+							// // }	
+						// // }
+					
+					// // if(repeated ==1)
+						// //
+					
+					// delete sortedDates_1[idx];
+		
+					// console.log("sortedDates "+sortedDates_1);
+					
+					// break;
+				// }
+			// idx=idx+1;
+			// }
+		// });
+		
+		// //repeated = 0;
+		// console.log("Index Order "+indexOrder);
+		
+		// /* converting date format to m/d/yy*/
+		// console.log("Conversion of date format");
+		// for(var i=0;i<sortedDates.length;i++)
+			// {
+				// var dateArr = sortedDates[i].split("-");
+				// var date = new Date(dateArr[0],dateArr[1],dateArr[2]);
+				// sortedDates[i] = date.getMonth()+"/"+date.getDate()+"/"+date.getYear().toString().substr(2,2);
+			// }
+			
+		// /* Append the contents to the table component - upcoming changes */
+		
+		// for(var k=0;k<sortedDates.length;k++)
+		// {
+					// upcomingContents =
+						// "<tr><td>" + sortedDates[k]+contentsArr[indexOrder.indexOf(k)];
+
+						// count = count + 1;
+
+						// if (count <= 5)
+						// {
+							// $('#tblSPContent').append(upcomingContents);
+						// }
+						// else
+							// return false;
+				
+    	// }
+		
+		// var rowCount = $("#tblSPContent").find('tr').size();
+		// if(count==0)
+		// {
+			// expandedHeight=DefaultHeight;
+			// $('.title div').html("No Upcoming Changes");
+		// }
+		// else
+		// {
+			// expandedHeight = DefaultHeight+upcomingBarHeight+parseInt(rowCount*rowHeight);
+			// $('.title div').html("Upcoming Changes");
+		// }
+	// }
+	
+	function nextFiveChanges(responseJSON_upcoming)
     {
     	$('#tblSPContent').empty();
 		filteredAppNames = new Array();
-		
-			filteredAppNames = getAppFilter();
-		
+		filteredAppNames = getAppFilter();
+
 		var upcomingContents="";
-    	var count = 0; var currDate; var j=0;
-		var sortedDates = new Array();
-		var sortedDates_1 = new Array();
-		var contentsArr = new Array();
-		var indexOrder = new Array(); 
-		 
-		 
-		/********* Sort the chg Date ******/ 
-		$.each(responseJSON, function(i, cal)
-    	{	
-			EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
-			var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
-			currDate = new Date();
-			appName = cal.AIM_x0020_Name.split(';#')[1];	
+    	var count = 0; var currDate; var j=0; var flag=0;
 			
-			if((EventDate_Formatted.getTime() >= currDate.getTime()))
-			{
-			  sortedDates.push(cal.EventDate.split(' ')[0]);
-			}
-		});
-		
-		sortedDates.sort();
-	
-		for(var k=0;k<sortedDates.length;k++)	
-			sortedDates_1[k]=sortedDates[k];
-			
-		/* Map the remaining columns as per the sorted dates */	
-    	$.each(responseJSON, function(i, cal)
+    	$.each(responseJSON_upcoming, function(i, cal)
     	{
+			//console.log(cal.EventDate+"   "+cal.LinkTitle+"   "+cal.LOB);
 			EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
     		EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
     		var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
-			appName = cal.AIM_x0020_Name.split(';#')[1];			  
-    		currDate = new Date();
-			var idx=sortedDates_1.length-1;
+			appName = cal.AIM_x0020_Name.split(';#')[1];				  
+    	
+			upcomingContents = upcomingContents+
+						"<tr><td>" + EventDate_Arr[2]+"/"+EventDate_Arr[3]+"/"+EventDate_Arr[1].toString().substr(2,2) + "</td>" + "<td>" + cal.LOB.trim() + "</td><td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
 		
-			while(idx>=0)
-			{
-			 if(EventDate_Arr[3]==sortedDates_1[idx].split('-')[2])
-				{
-					indexOrder[j++]=idx;
-					
-					contentsArr.push("</td>" + "<td>" + cal.LOB.trim() + "</td><td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>");
-					
-					sortedDates_1.splice(idx,1);
-
-					break;
-				}
-			idx=idx-1;
-			}
-		});
-		
-		
-		/* Append the contents to the table component - upcoming changes */
-		for(var k=0;k<sortedDates.length;k++)
-		{
-					upcomingContents =
-						"<tr><td>" + sortedDates[k]+contentsArr[indexOrder.indexOf(k)];
-
-						count = count + 1;
-
-						if (count <= 5)
-						{
-							$('#tblSPContent').append(upcomingContents);
-						}
-						else
-							return false;
-				
-    	}
-		
+			count=count+1;				
+			if(count==5)
+				$('#tblSPContent').append(upcomingContents);
+    	});
+			
 		var rowCount = $("#tblSPContent").find('tr').size();
-		if(count==0)
-		{
-			expandedHeight=DefaultHeight;
-			$('.title div').html("No Upcoming Changes");
-		}
-		else
-		{
 			expandedHeight = DefaultHeight+upcomingBarHeight+parseInt(rowCount*rowHeight);
 			$('.title div').html("Upcoming Changes");
-		}
+		
 	}
+
+	
+	
+		
+	// function nextFiveChanges(responseJSON)
+    // {
+    	// $('#tblSPContent').empty();
+		// filteredAppNames = new Array();
+		// filteredAppNames = getAppFilter();
+		
+		// var upcomingContents="";
+    	// var count = 0; var currDate; var j=0; var flag=0;
+				
+    	// $.each(responseJSON, function(i, cal)
+    	// {
+			// EventDate_Arr = cal.EventDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+    		// EndDate_Arr = cal.EndDate.match(/^(\d+)-(\d+)-(\d+) (\d+)\:(\d+)\:(\d+)$/);
+    		// var EventDate_Formatted = new Date(EventDate_Arr[1], EventDate_Arr[2] - 1, EventDate_Arr[3], EventDate_Arr[4], EventDate_Arr[5], EventDate_Arr[6]);
+			// appName = cal.AIM_x0020_Name.split(';#')[1];				  
+    		// currDate = new Date();
+			// currDate.setDate(currDate.getDate()-1);
+		
+			// if(EventDate_Formatted.getDate()>=currDate.getDate())
+			// {
+					// upcomingContents = 
+						// "<tr><td>" + EventDate_Arr[2]+"/"+EventDate_Arr[3]+"/"+EventDate_Arr[1].toString().substr(2,2) + "</td>" + "<td>" + cal.LOB.trim() + "</td><td>" + truncateString(appName, truncateLimit) + "</td>" + '<td><a href="https://teams.aexp.com/sites/teamsitewendy/Lists/Change%20Calendar/dispform.aspx?ID=' + cal.ID + '">' + truncateString(cal.LinkTitle, truncateLimit) + '</a></td>' + "</tr>";
+
+						// count = count + 1;
+
+						// if (count <= 5)
+						// {
+							// $('#tblSPContent').append(upcomingContents);
+						// }
+						// else
+							// return false;
+				
+			// }
+			
+    	// });
+		
+		// var rowCount = $("#tblSPContent").find('tr').size();
+		// if(count==0)
+		// {
+			// expandedHeight=DefaultHeight;
+			// $('.title div').html("No Upcoming Changes");
+		// }
+		// else
+		// {
+			// expandedHeight = DefaultHeight+upcomingBarHeight+parseInt(rowCount*rowHeight);
+			// $('.title div').html("Upcoming Changes");
+		// }
+		
+	// }
+
+	
+	
 	
 	function getAppFilter()
 			{
@@ -464,9 +601,8 @@
 		filteredAppNames = new Array();
 		
     	var functionStatus;
-
-			filteredAppNames = getAppFilter();
-		
+		filteredAppNames = getAppFilter();
+		//console.log("Filtered = "+filteredAppNames);
 		myQuery = getfilteredQuery(start,end,filteredAppNames);
 			
     	$().SPServices(
@@ -490,10 +626,43 @@
 
     		/*****************************************************************/
     	});
-		flag=0;
     	return responseJSON;
     }
  
+ 
+	 function getUpcomingChanges()
+    {
+    	var responseUpcomingJSON,myUpcomingQuery;
+		var functionStatus;
+		var currDate = new Date();
+		
+		filteredAppNames = new Array();
+		filteredAppNames = getAppFilter();
+		
+		myUpcomingQuery = getUpcomingChangesQuery(currDate);
+			
+    	$().SPServices(
+    	{
+    		operation: "GetListItems",
+    		async: false,
+    		listName: changeCalendarList,
+    		CAMLViewFields: "<ViewFields Properties='True'><FieldRef Name='LinkTitle' /><FieldRef Name='Project_x0020_ID' /><FieldRef Name='AIM_x0020_Name' /><FieldRef Name='Tech_x0020_PM' /><FieldRef Name='EventDate' /><FieldRef Name='EndDate' /><FieldRef Name='AIM_x0020_Name_x003a_AIM_x0020_A'/><FieldRef Name='AIM_x0020_Name_x003a_AIM_x0020_D' /><FieldRef Name='AIM_x0020_Name_x003a_AIM_x0020_V' /><FieldRef Name='AIM_x0020_Name_x003a_AIM_x0020_V0' /><FieldRef Name='Impact' /><FieldRef Name='Outage' /><FieldRef Name='Incident_x0020__x0023_' /><FieldRef Name='Business_x0020_Comm_x0020_Requir' /><FieldRef Name='Bus_x0020_Comm_x0020_Date' /><FieldRef Name='LOB' /><FieldRef Name='Tech_x0020_Comm_x0020_Date' /></ViewFields>",
+    		CAMLQuery: myUpcomingQuery,
+    		completefunc: function(xData, Status)
+    		{
+    			responseUpcomingJSON = $(xData.responseXML).SPFilterNode("z:row").SPXmlToJson(
+    			{
+    				mapping:
+    				{},
+    				includeAllAttrs: true
+    			});
+    		}
+
+    		/*****************************************************************/
+    	});
+    	return responseUpcomingJSON;
+    }
+	
     function truncateString(str, limit)
     {
     	if (str.length > limit)
@@ -501,12 +670,38 @@
     	return str;
     }
 
-	// function ResetSelection()
-	// {
-		// flag=1;
-		// $("#appSelect > option").prop("selected", false);
-		// refresh();
-	// }
+	function ResetSelection()
+	{
+		$("#appSelect > option").prop("selected", false);
+		refresh();
+	}
+	
+	
+	function getUpcomingChangesQuery(currDate)
+			{
+				var myUpcomingQuery; 
+				
+			/********** Changes of selected applications **********/
+					var date = currDate.toISOString().replace(/\..*/, "Z").trim();
+					
+					//"2014-02-28T00:00:00Z"
+					myUpcomingQuery =
+					"<Query>" +
+						"<Where>" +
+							"<Geq>" +
+								"<FieldRef Name='EventDate'/>" +
+								"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + date + "</Value>" +
+							"</Geq>" +
+						"</Where>" +
+						"<OrderBy>"+
+							"<FieldRef Name='EventDate' Ascending='TRUE' />"+
+						"</OrderBy>"+
+					"<RowLimit>"+5+"</RowLimit>"+
+					"</Query>";
+				
+				return myUpcomingQuery;
+		}	
+	
 	
 	function getfilteredQuery(chgStart,chgEnd,filteredAppNames)
 			{
@@ -528,6 +723,9 @@
 								"<Value Type='DateTime' IncludeTimeValue='FALSE'>" + chgEnd + "</Value>" +
 							"</Leq>" +
 						"</And></Where>" +
+						"<OrderBy>"+
+						"<FieldRef Name='EventDate' Ascending='TRUE' />"+
+						"</OrderBy>"+
 					"</Query>";
 				}
 				
@@ -552,6 +750,9 @@
 								"</Eq>" +
 							"</And>"+
 							"</Where>" +
+							"<OrderBy>"+
+							"<FieldRef Name='EventDate' Ascending='TRUE' />"+
+							"</OrderBy>"+
 						"</Query>"; 
 				}
 				else if(filteredAppNames.length==2)
@@ -578,6 +779,9 @@
 						"</In>"+
 					"</And>"+
 					"</Where>"+
+					"<OrderBy>"+
+					"<FieldRef Name='EventDate' Ascending='TRUE' />"+
+					"</OrderBy>"+
 					"</Query>";
 				}
 				else if(filteredAppNames.length==3)
@@ -605,6 +809,9 @@
 						"</In>"+
 					"</And>"+
 					"</Where>"+
+					"<OrderBy>"+
+					"<FieldRef Name='EventDate' Ascending='TRUE' />"+
+					"</OrderBy>"+
 					"</Query>";
 				}
 
